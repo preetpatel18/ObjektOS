@@ -9,6 +9,7 @@ By: Preet Patel
 // Input from the Terminal
 const readline = require('readline');
 const {Lexer} = require('../src/Lexer.js');
+const { Parser } = require('../src/Parser.js');
 
 async function getStdin(){
     const rl = readline.createInterface({
@@ -22,8 +23,11 @@ async function getStdin(){
         });
     });
 }
-3
+
+
 async function main(){
+    let showTokenTypes = true; // Show Token Types
+
     while(true){
         const input = await getStdin();
         if(input === "#q"){ // Exiting
@@ -33,10 +37,17 @@ async function main(){
             console.clear();
             console.log(">>> Terminal Cleared.");
             continue;
-        } // Consider Adding More commands
-        
+        } else if(input === "#t"){ // Toggle Token Types
+            showTokenTypes = !showTokenTypes;
+            console.log(`>>> Token Types ${showTokenTypes ? "Enabled" : "Disabled"}`);
+            continue;
+        }
         let lexer = new Lexer(input);
-        lexer.tokenize();
+        let tokens = lexer.tokenize();
+        
+        if(showTokenTypes){
+            console.log(tokens);
+        }
     }
 }
 

@@ -4,7 +4,6 @@
  * 
  * By: Preet Patel
  */
-
 class Lexer {
 	constructor(inputText) {
 		this.inputText = inputText;
@@ -15,10 +14,17 @@ class Lexer {
 			{ type: 'SUBTRACTION_TOKEN', regex: /^\-/ },
 			{ type: 'MULTIPLICATION_TOKEN', regex: /^\*/ },
 			{ type: 'DIVISION_TOKEN', regex: /^\// },
-			{ type: 'WHITESPACE_TOKEN', regex: /^\s+/}
+			{ type: 'WHITESPACE_TOKEN', regex: /^\s+/},
+			{ type: 'LPAREN_TOKEN', regex: /^\(/ },
+			{ type: 'RPAREN_TOKEN', regex: /^\)/ }
 		];
 	}
-
+	/**
+	 * Tokenizes the input text based on the defined token types.
+	 * 
+	 * @returns {Array} tokens - An array of tokens extracted from the input text.
+	 * @throws {Error} If an unrecognized token is found in the input text.
+	 */
 	tokenize() {
 		console.log(this.inputText);
 		let currentIndex = 0;
@@ -48,10 +54,9 @@ class Lexer {
 			if(tokenType.type === 'WHITESPACE_TOKEN') continue; // Skip whitespace tokens
 			this.tokens = this.tokens.filter(token => token.tokenType !== 'WHITESPACE_TOKEN');
 		}
-
-		console.log(this.tokens);
 		return this.tokens;
 	}
 }
+
 
 exports.Lexer = Lexer;
