@@ -7,7 +7,6 @@ class Parser {
         this.#tokens = tokens;
         this.#position = 0;
     }
-    
 
     #currentToken() {
         return this.#peek(0);
@@ -16,7 +15,7 @@ class Parser {
     #peek(offset) {
         const index = this.#position + offset;
         if (index >= this.#tokens.length) {
-            return this.#tokens[this.#tokens.length - 1]; // Return EOF token
+            return this.#tokens[this.#tokens.length - 1]; // return EOF token
         }
         return this.#tokens[index];
     }
@@ -25,10 +24,9 @@ class Parser {
         if (this.#currentToken().tokenType === tokenType) {
             return this.#nextToken();
         }
-        console.log(
-            `>> PARSER ERROR: UNEXPECTED TOKEN: ${this.#currentToken().tokenType}, EXPECTED: ${tokenType}`
+        throw new Error(
+            `Unexpected token: ${this.#currentToken().tokenType}, expected: ${tokenType}`
         );
-        return;
     }
 
     #nextToken() {
@@ -36,7 +34,50 @@ class Parser {
         this.#position++;
         return current;
     }
+
+    // Grammar rules:
+    // Expression → Term ( ("+" | "-") Term )*
+    parseExpression() {
+        let node = this.parseTerm();
+        while (this.#currentToken().tokenType === 'ADDITION_TOKEN' ||
+               this.#currentToken().tokenType === 'SUBTRACTION_TOKEN') {
+            let operator = this.#nextToken();
+            let right = this.parseTerm();
+            node = { type: 'BinaryExpr', operator: operator.tokenValue, left: node, right: right };
+        }
+        return node;
+    }
+
+    // Term → Factor ( ("*" | "/") Factor )*
+    parseTerm() {
+        let node = this.parseFactor();
+        while (this.#currentToken().tokenType === 'MULTIPLICATION_TOKEN' ||
+               this.#currentToken().tokenType === 'DIVISION_TOKEN') {
+            let operator = this.#nextToken();
+            let right = this.parseFactor();
+            node = { type: 'BinaryExpr', operator: operator.tokenValue, left: node, right: right };
+        }
+        return node;
+    }
+
+    // Factor → NUMBER | "(" Expression ")"
+    parseFactor() {
+        let token = this.#currentToken();
+
+        if (token.tokenType === 'NUMS_TOKEN') {
+            this.#nextToken();
+            return { type: 'NumberLiteral', value: Number(token.tokenValue) };
+        }
+
+        if (token.tokenType === 'LPAREN_TOKEN') {
+            this.#nextToken();
+            let expr = this.parseExpression();
+            this.#equal('RPAREN_TOKEN');
+            return expr;
+        }
+
+        throw new Error(`Unexpected token in factor: ${token.tokenType}`);
+    }
 }
 
-// ✅ Export the class
 module.exports = { Parser };

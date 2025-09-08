@@ -6,12 +6,11 @@ the Terminal.
 By: Preet Patel
 **********************************/
 
-// Input from the Terminal
 const readline = require('readline');
-const {Lexer} = require('../src/Lexer.js');
+const { Lexer } = require('../src/Lexer.js');
 const { Parser } = require('../src/Parser.js');
 
-async function getStdin(){
+async function getStdin() {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
@@ -24,29 +23,61 @@ async function getStdin(){
     });
 }
 
+function evaluate(node) {
+    if (node.type === 'NumberLiteral') return node.value;
 
-async function main(){
-    let showTokenTypes = true; // Show Token Types
+    if (node.type === 'BinaryExpr') {
+        let left = evaluate(node.left);
+        let right = evaluate(node.right);
+        switch (node.operator) {
+            case '+': return left + right;
+            case '-': return left - right;
+            case '*': return left * right;
+            case '/': return left / right;
+        }
+    }
+    throw new Error(`Unknown AST node: ${JSON.stringify(node)}`);
+}
 
-    while(true){
+async function main() {
+    let showTokenTypes = true;
+
+    while (true) {
         const input = await getStdin();
-        if(input === "#q"){ // Exiting
+        if (input === "#q") {
             console.log(">>> Exiting the TERMINAL");
             break;
-        }else if(input === "#c"){ // Clearing the Terminal
+        } else if (input === "#c") {
             console.clear();
             console.log(">>> Terminal Cleared.");
             continue;
-        } else if(input === "#t"){ // Toggle Token Types
+        } else if (input === "#t") {
             showTokenTypes = !showTokenTypes;
             console.log(`>>> Token Types ${showTokenTypes ? "Enabled" : "Disabled"}`);
             continue;
         }
+
         let lexer = new Lexer(input);
-        let tokens = lexer.tokenize();
-        
-        if(showTokenTypes){
-            console.log(tokens);
+        let tokens;
+        try {
+            tokens = lexer.tokenize();
+        } catch (err) {
+            console.log(err.message);
+            continue;
+        }
+
+        if (showTokenTypes) {
+            console.log("Tokens:", tokens);
+        }
+
+        try {
+            let parser = new Parser(tokens);
+            let ast = parser.parseExpression();
+            console.log("AST:", JSON.stringify(ast, null, 2));
+            let result = evaluate(ast);
+            console.log("Result:", result);
+        } catch (err) {
+            console.log(">> PARSER ERROR:", err.message);
         }
     }
 }
