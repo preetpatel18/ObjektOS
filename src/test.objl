@@ -1,0 +1,42 @@
+# Variable assignments
+let x = 2
+let y = 5
+let z = x + y
+
+# Let declaration
+let a = 10
+let b = a + z
+
+# If / Else if / Else
+if (x > y) {
+    print("x is greater than y")
+} ef (x == y) {
+    print("x equals y")
+} else {
+    print("x is less than y")
+}
+
+# While loop
+let i = 0
+while (i < 3) {
+    print("i is", i)
+    i = i + 1
+}
+
+# For loop (initializer; condition; increment)
+for (let j = 0; j < 3; j = j + 1) {
+    print("j is", j)
+}
+
+# Nested expressions
+let sum = (x + y) * (a - 2) / 2
+print("sum:", sum)
+
+# String concatenation using comma in print
+let msg = "Hello"
+print(msg, "world!")
+
+# Test identifiers used in expressions
+let result = x * y + z / 2
+print("result:", result)
+
